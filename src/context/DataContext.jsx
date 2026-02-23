@@ -39,9 +39,9 @@ export const DataProvider = ({ children }) => {
         setLoading(true);
         try {
             const [ordersRes, inventoryRes, customersRes] = await Promise.all([
-                api.get('/orders'),
-                api.get('/inventory'),
-                api.get('/customers').catch(() => ({ data: { data: [] } }))
+                api.get('orders'),
+                api.get('inventory'),
+                api.get('customers').catch(() => ({ data: { data: [] } }))
             ]);
 
             // Map inventory
@@ -96,7 +96,7 @@ export const DataProvider = ({ children }) => {
 
     const login = async (username, password) => {
         try {
-            const response = await api.post('/login', { username, password });
+            const response = await api.post('login', { username, password });
 
             // The api service already returns response.data via interceptor
             // So response here is { status: true, message: '...', data: { user, token } }
@@ -120,7 +120,7 @@ export const DataProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-            await api.post('/logout');
+            await api.post('logout');
         } catch (error) {
             console.error('Logout error:', error);
         } finally {
@@ -136,7 +136,7 @@ export const DataProvider = ({ children }) => {
 
             // Handle New Customer
             if (!customerId && orderData.customerName) {
-                const customerRes = await api.post('/customers', {
+                const customerRes = await api.post('customers', {
                     name: orderData.customerName,
                     phone: orderData.customerPhone,
                     email: orderData.customerEmail,
@@ -162,7 +162,7 @@ export const DataProvider = ({ children }) => {
                 }))
             };
 
-            const response = await api.post('/orders', backendOrderData);
+            const response = await api.post('orders', backendOrderData);
             const returnedOrder = response.data;
 
             // Map back to frontend structure
@@ -195,7 +195,7 @@ export const DataProvider = ({ children }) => {
 
             // Handle New Customer
             if (!customerId && orderData.customerName) {
-                const customerRes = await api.post('/customers', {
+                const customerRes = await api.post('customers', {
                     name: orderData.customerName,
                     phone: orderData.customerPhone,
                     email: orderData.customerEmail,
@@ -220,7 +220,7 @@ export const DataProvider = ({ children }) => {
                 }))
             };
 
-            const response = await api.put(`/orders/${orderId}`, backendOrderData);
+            const response = await api.put(`orders/${orderId}`, backendOrderData);
             const returnedOrder = response.data;
 
             // Map back to frontend structure
@@ -253,7 +253,7 @@ export const DataProvider = ({ children }) => {
 
     const addInventoryItem = async (item) => {
         try {
-            const response = await api.post('/inventory', item);
+            const response = await api.post('inventory', item);
             const newItem = response.data;
             setInventory([...inventory, newItem]);
             return newItem;
@@ -265,7 +265,7 @@ export const DataProvider = ({ children }) => {
 
     const deleteOrder = async (orderId) => {
         try {
-            await api.delete(`/orders/${orderId}`);
+            await api.delete(`orders/${orderId}`);
             setOrders(orders.filter(o => o.id !== orderId));
             return { success: true };
         } catch (error) {
@@ -276,7 +276,7 @@ export const DataProvider = ({ children }) => {
 
     const deleteCustomer = async (customerId) => {
         try {
-            await api.delete(`/customers/${customerId}`);
+            await api.delete(`customers/${customerId}`);
             setCustomers(customers.filter(c => c.id !== customerId));
             return { success: true };
         } catch (error) {
