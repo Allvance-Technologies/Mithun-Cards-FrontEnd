@@ -183,6 +183,10 @@ const OrderCategory = () => {
       alert('Please select/enter customer name and add items.');
       return;
     }
+    if (isNewCustomer && !customerPhone.trim()) {
+      alert('Please enter mobile number.');
+      return;
+    }
 
     const orderData = {
       items: itemsForOrder,
@@ -344,8 +348,8 @@ const OrderCategory = () => {
                       <input type="text" className="form-input" placeholder="Enter name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
                     </div>
                     <div className="customer-input-section" style={{ marginTop: '12px' }}>
-                      <label>Phone</label>
-                      <input type="tel" className="form-input" placeholder="Phone (optional)" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} />
+                      <label>Phone *</label>
+                      <input type="tel" className="form-input" placeholder="Enter mobile number" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} required />
                     </div>
                     <div className="customer-input-section" style={{ marginTop: '12px' }}>
                       <label>Email</label>

@@ -17,7 +17,7 @@ export const DataProvider = ({ children }) => {
         const saved = localStorage.getItem('settings');
         return saved ? JSON.parse(saved) : {
             companyName: 'Mithun Cards',
-            currency: 'USD',
+            currency: 'INR',
             taxRate: 8.25,
             taxMode: 'exclusive',
             theme: 'system',
