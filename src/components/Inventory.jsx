@@ -261,6 +261,18 @@ const Inventory = () => {
                                 <option value="Custom Card">Custom Card</option>
                             </select>
                         </div>
+                        {newItem.category === 'Custom Card' && (
+                            <div className="form-group" style={{ marginTop: '-12px', paddingLeft: '8px' }}>
+                                <label style={{ fontSize: '14px', color: '#4B5563' }}>Specify Card Type Name *</label>
+                                <input
+                                    type="text"
+                                    className="form-input"
+                                    value={newItem.customCategory}
+                                    onChange={(e) => setNewItem({ ...newItem, customCategory: e.target.value })}
+                                    placeholder="e.g. Posters, Calendars"
+                                />
+                            </div>
+                        )}
                         <div className="form-group">
                             <label>Initial Stock</label>
                             <input
