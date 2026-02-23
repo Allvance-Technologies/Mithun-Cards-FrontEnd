@@ -222,7 +222,7 @@ const ProductList = () => {
                                 <ArrowLeft size={20} />
                             </button>
                             <div>
-                                <p style={{ fontSize: '12px', color: '#6B7280', marginBottom: '2px' }}>{cardType?.name || 'Card Type'} →</p>
+                                <p style={{ fontSize: '12px', color: '#6B7280', marginBottom: '2px' }}>{cardType?.name || 'Product Type'} →</p>
                                 <h1 className="page-title">{subcategory?.name || 'Products'}</h1>
                                 <p className="page-subtitle">Manage products in this subcategory.</p>
                             </div>

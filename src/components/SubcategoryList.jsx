@@ -115,8 +115,8 @@ const SubcategoryList = () => {
                                 <ArrowLeft size={20} />
                             </button>
                             <div>
-                                <h1 className="page-title">{cardType?.name || 'Card Type'}</h1>
-                                <p className="page-subtitle">Manage subcategories inside this card type.</p>
+                                <h1 className="page-title">{cardType?.name || 'Product Type'}</h1>
+                                <p className="page-subtitle">Manage subcategories inside this product type.</p>
                             </div>
                         </div>
                         <div className="header-actions">

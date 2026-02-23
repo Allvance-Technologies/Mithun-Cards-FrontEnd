@@ -38,8 +38,8 @@ const NewOrder = () => {
               {cardTypes.length === 0 && (
                 <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px 20px', color: '#9CA3AF' }}>
                   <FolderOpen size={40} style={{ marginBottom: '12px', opacity: 0.5 }} />
-                  <p style={{ fontSize: '15px', fontWeight: '500', marginBottom: '6px' }}>No card types created yet</p>
-                  <p style={{ fontSize: '13px' }}>Go to Inventory → Add Card Type to create categories first.</p>
+                  <p style={{ fontSize: '15px', fontWeight: '500', marginBottom: '6px' }}>No product types created yet</p>
+                  <p style={{ fontSize: '13px' }}>Go to Inventory → Add Product Type to create categories first.</p>
                 </div>
               )}
             </div>

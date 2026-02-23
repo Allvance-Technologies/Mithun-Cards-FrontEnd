@@ -21,12 +21,12 @@ const Inventory = () => {
     const navigate = useNavigate();
     const { inventory, cardTypes, addInventoryItem, updateInventoryItem, addCardType, deleteCardType, updateCardType } = useData();
 
-    // Add Card Type Modal
+    // Add Product Type Modal
     const [showAddTypeModal, setShowAddTypeModal] = useState(false);
     const [newTypeName, setNewTypeName] = useState('');
     const [newTypeDesc, setNewTypeDesc] = useState('');
 
-    // Edit Card Type Modal
+    // Edit Product Type Modal
     const [showEditTypeModal, setShowEditTypeModal] = useState(false);
     const [editingType, setEditingType] = useState(null);
     const [editTypeName, setEditTypeName] = useState('');
@@ -40,7 +40,7 @@ const Inventory = () => {
             setNewTypeDesc('');
             setShowAddTypeModal(false);
         } catch (error) {
-            alert('Error creating card type: ' + (error?.message || 'Unknown error'));
+            alert('Error creating product type: ' + (error?.message || 'Unknown error'));
         }
     };
 
@@ -51,7 +51,7 @@ const Inventory = () => {
             setShowEditTypeModal(false);
             setEditingType(null);
         } catch (error) {
-            alert('Error updating card type: ' + (error?.message || 'Unknown error'));
+            alert('Error updating product type: ' + (error?.message || 'Unknown error'));
         }
     };
 
@@ -60,7 +60,7 @@ const Inventory = () => {
         try {
             await deleteCardType(id);
         } catch (error) {
-            alert('Error deleting card type: ' + (error?.message || 'Unknown error'));
+            alert('Error deleting product type: ' + (error?.message || 'Unknown error'));
         }
     };
 
@@ -79,7 +79,7 @@ const Inventory = () => {
                 <header className="top-bar">
                     <div className="search-container">
                         <Search className="search-icon" size={20} />
-                        <input type="text" placeholder="Search card types..." className="search-input" />
+                        <input type="text" placeholder="Search product types..." className="search-input" />
                     </div>
                     <div className="top-actions">
                         <button className="icon-btn">
@@ -95,16 +95,16 @@ const Inventory = () => {
                     <div className="page-header">
                         <div>
                             <h1 className="page-title">Stock & Inventory</h1>
-                            <p className="page-subtitle">Manage your card types, subcategories, and stock levels.</p>
+                            <p className="page-subtitle">Manage your product types, subcategories, and stock levels.</p>
                         </div>
                         <div className="header-actions">
                             <div className="search-wrapper-large">
                                 <Search className="search-icon" size={18} />
-                                <input type="text" placeholder="Search card types..." />
+                                <input type="text" placeholder="Search product types..." />
                             </div>
                             <button className="btn-primary" onClick={() => setShowAddTypeModal(true)}>
                                 <FolderPlus size={20} />
-                                <span>Add Card Type</span>
+                                <span>Add Product Type</span>
                             </button>
                         </div>
                     </div>
@@ -155,8 +155,8 @@ const Inventory = () => {
                         {cardTypes.length === 0 && (
                             <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '60px 20px', color: '#9CA3AF' }}>
                                 <FolderPlus size={48} style={{ marginBottom: '16px', opacity: 0.5 }} />
-                                <p style={{ fontSize: '16px', fontWeight: '500', marginBottom: '8px' }}>No card types yet</p>
-                                <p style={{ fontSize: '14px' }}>Click "Add Card Type" to create your first category.</p>
+                                <p style={{ fontSize: '16px', fontWeight: '500', marginBottom: '8px' }}>No product types yet</p>
+                                <p style={{ fontSize: '14px' }}>Click "Add Product Type" to create your first category.</p>
                             </div>
                         )}
                     </div>
@@ -173,13 +173,13 @@ const Inventory = () => {
                         backgroundColor: 'white', borderRadius: '16px', padding: '32px', width: '90%', maxWidth: '450px', boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
                     }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                            <h2 style={{ fontSize: '20px', fontWeight: '700' }}>Add Card Type</h2>
+                            <h2 style={{ fontSize: '20px', fontWeight: '700' }}>Add Product Type</h2>
                             <button style={{ background: 'none', border: 'none', cursor: 'pointer' }} onClick={() => setShowAddTypeModal(false)}>
                                 <X size={24} />
                             </button>
                         </div>
                         <div className="form-group">
-                            <label>Card Type Name *</label>
+                            <label>Product Type Name *</label>
                             <input
                                 type="text"
                                 className="form-input"
@@ -216,13 +216,13 @@ const Inventory = () => {
                         backgroundColor: 'white', borderRadius: '16px', padding: '32px', width: '90%', maxWidth: '450px', boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
                     }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                            <h2 style={{ fontSize: '20px', fontWeight: '700' }}>Edit Card Type</h2>
+                            <h2 style={{ fontSize: '20px', fontWeight: '700' }}>Edit Product Type</h2>
                             <button style={{ background: 'none', border: 'none', cursor: 'pointer' }} onClick={() => setShowEditTypeModal(false)}>
                                 <X size={24} />
                             </button>
                         </div>
                         <div className="form-group">
-                            <label>Card Type Name *</label>
+                            <label>Product Type Name *</label>
                             <input
                                 type="text"
                                 className="form-input"
