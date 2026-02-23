@@ -12,10 +12,13 @@ import {
     X,
     Upload,
     Image as ImageIcon,
-    Edit
+    Edit,
+    PlusCircle
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Inventory = () => {
+    const navigate = useNavigate();
     const { addInventoryItem, updateInventoryItem } = useData();
     const [showAddModal, setShowAddModal] = useState(false);
     const [newItem, setNewItem] = useState({ title: '', stock: 0, price: 0, image: '' });
@@ -116,13 +119,13 @@ const Inventory = () => {
 
                     <div className="card" style={{ marginBottom: '24px' }}>
                         <div className="order-selection-row">
-                            <button className="action-btn" onClick={() => window.location.assign('/inventory/invitation-cards')}>
+                            <button className="action-btn" onClick={() => navigate('/inventory/invitation-cards')}>
                                 <span>Invitation Cards</span>
                             </button>
-                            <button className="action-btn" onClick={() => window.location.assign('/inventory/visiting-cards')}>
+                            <button className="action-btn" onClick={() => navigate('/inventory/visiting-cards')}>
                                 <span>Visiting Cards</span>
                             </button>
-                            <button className="action-btn" onClick={() => window.location.assign('/inventory/bill-books')}>
+                            <button className="action-btn" onClick={() => navigate('/inventory/bill-books')}>
                                 <span>Bill Books</span>
                             </button>
                         </div>
