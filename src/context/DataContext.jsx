@@ -10,6 +10,7 @@ export const DataProvider = ({ children }) => {
     const [customers, setCustomers] = useState([]);
     const [orders, setOrders] = useState([]);
     const [expenses, setExpenses] = useState([]);
+    const [cardTypes, setCardTypes] = useState([]);
     const [loading, setLoading] = useState(false);
 
     const [settings, setSettings] = useState(() => {
@@ -38,16 +39,19 @@ export const DataProvider = ({ children }) => {
     const fetchDashboardData = async () => {
         setLoading(true);
         try {
-            const [ordersRes, inventoryRes, customersRes] = await Promise.all([
+            const [ordersRes, inventoryRes, customersRes, cardTypesRes] = await Promise.all([
                 api.get('orders'),
                 api.get('inventory'),
-                api.get('customers').catch(() => ({ data: { data: [] } }))
+                api.get('customers').catch(() => ({ data: { data: [] } })),
+                api.get('card-types').catch(() => ({ data: [] }))
             ]);
 
             // Map inventory
             const mappedInventory = (inventoryRes.data || []).map(item => ({
                 id: item.id,
                 title: item.item_name,
+                category: item.category,
+                subcategory_id: item.subcategory_id,
                 stock: item.stock_quantity,
                 price: item.cost_per_unit,
                 status: item.is_low_stock ? 'Low Stock' : (item.stock_quantity === 0 ? 'Out of Stock' : 'In Stock'),
@@ -87,6 +91,7 @@ export const DataProvider = ({ children }) => {
             setOrders(mappedOrders);
             setInventory(mappedInventory);
             setCustomers(mappedCustomers);
+            setCardTypes(cardTypesRes.data || []);
         } catch (error) {
             console.error('Error fetching data:', error);
         } finally {
@@ -314,6 +319,81 @@ export const DataProvider = ({ children }) => {
         localStorage.setItem('settings', JSON.stringify(updated));
     };
 
+    // Card Types CRUD
+    const addCardType = async (data) => {
+        try {
+            const response = await api.post('card-types', data);
+            setCardTypes(prev => [...prev, response.data]);
+            return response.data;
+        } catch (error) {
+            console.error('Add card type error:', error);
+            throw error;
+        }
+    };
+
+    const updateCardType = async (id, data) => {
+        try {
+            const response = await api.put(`card-types/${id}`, data);
+            setCardTypes(prev => prev.map(ct => ct.id === id ? response.data : ct));
+            return response.data;
+        } catch (error) {
+            console.error('Update card type error:', error);
+            throw error;
+        }
+    };
+
+    const deleteCardType = async (id) => {
+        try {
+            await api.delete(`card-types/${id}`);
+            setCardTypes(prev => prev.filter(ct => ct.id !== id));
+            return { success: true };
+        } catch (error) {
+            console.error('Delete card type error:', error);
+            throw error;
+        }
+    };
+
+    // Subcategory CRUD
+    const getSubcategories = async (cardTypeId) => {
+        try {
+            const response = await api.get(`card-types/${cardTypeId}/subcategories`);
+            return response.data || [];
+        } catch (error) {
+            console.error('Get subcategories error:', error);
+            return [];
+        }
+    };
+
+    const addSubcategory = async (cardTypeId, data) => {
+        try {
+            const response = await api.post(`card-types/${cardTypeId}/subcategories`, data);
+            return response.data;
+        } catch (error) {
+            console.error('Add subcategory error:', error);
+            throw error;
+        }
+    };
+
+    const updateSubcategory = async (cardTypeId, subId, data) => {
+        try {
+            const response = await api.put(`card-types/${cardTypeId}/subcategories/${subId}`, data);
+            return response.data;
+        } catch (error) {
+            console.error('Update subcategory error:', error);
+            throw error;
+        }
+    };
+
+    const deleteSubcategory = async (cardTypeId, subId) => {
+        try {
+            await api.delete(`card-types/${cardTypeId}/subcategories/${subId}`);
+            return { success: true };
+        } catch (error) {
+            console.error('Delete subcategory error:', error);
+            throw error;
+        }
+    };
+
     return (
         <DataContext.Provider value={{
             inventory,
@@ -321,6 +401,7 @@ export const DataProvider = ({ children }) => {
             orders,
             settings,
             expenses,
+            cardTypes,
             loading,
             addOrder,
             updateOrder,
@@ -329,6 +410,13 @@ export const DataProvider = ({ children }) => {
             addInventoryItem,
             updateInventoryItem,
             deleteInventoryItem,
+            addCardType,
+            updateCardType,
+            deleteCardType,
+            getSubcategories,
+            addSubcategory,
+            updateSubcategory,
+            deleteSubcategory,
             updateSettings,
             currentUser,
             login,

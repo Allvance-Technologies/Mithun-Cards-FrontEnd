@@ -6,87 +6,69 @@ import {
     Plus,
     Bell,
     UserCircle,
-    MoreHorizontal,
     ChevronLeft,
     ChevronRight,
     X,
     Upload,
     Image as ImageIcon,
     Edit,
-    PlusCircle
+    Trash2,
+    FolderPlus
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Inventory = () => {
     const navigate = useNavigate();
-    const { inventory, addInventoryItem, updateInventoryItem } = useData();
-    const [showAddModal, setShowAddModal] = useState(false);
-    const [newItem, setNewItem] = useState({ title: '', category: 'Invitation Cards', customCategory: '', stock: 0, price: 0, image: '' });
-    const [imagePreview, setImagePreview] = useState('');
+    const { inventory, cardTypes, addInventoryItem, updateInventoryItem, addCardType, deleteCardType, updateCardType } = useData();
 
-    // Edit State
-    const [showEditModal, setShowEditModal] = useState(false);
-    const [editingItem, setEditingItem] = useState(null);
-    const [editImagePreview, setEditImagePreview] = useState('');
-    const [customEditCategory, setCustomEditCategory] = useState('');
+    // Add Card Type Modal
+    const [showAddTypeModal, setShowAddTypeModal] = useState(false);
+    const [newTypeName, setNewTypeName] = useState('');
+    const [newTypeDesc, setNewTypeDesc] = useState('');
 
-    const handleImageUpload = (e, isEdit = false) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                if (isEdit) {
-                    setEditImagePreview(reader.result);
-                    setEditingItem({ ...editingItem, image: reader.result });
-                } else {
-                    setImagePreview(reader.result);
-                    setNewItem({ ...newItem, image: reader.result });
-                }
-            };
-            reader.readAsDataURL(file);
+    // Edit Card Type Modal
+    const [showEditTypeModal, setShowEditTypeModal] = useState(false);
+    const [editingType, setEditingType] = useState(null);
+    const [editTypeName, setEditTypeName] = useState('');
+    const [editTypeDesc, setEditTypeDesc] = useState('');
+
+    const handleAddCardType = async () => {
+        if (!newTypeName.trim()) return;
+        try {
+            await addCardType({ name: newTypeName.trim(), description: newTypeDesc.trim() || null });
+            setNewTypeName('');
+            setNewTypeDesc('');
+            setShowAddTypeModal(false);
+        } catch (error) {
+            alert('Error creating card type: ' + (error?.message || 'Unknown error'));
         }
     };
 
-    const handleAddItem = async () => {
-        if (!newItem.title) return;
-
+    const handleEditCardType = async () => {
+        if (!editTypeName.trim() || !editingType) return;
         try {
-            const finalCategory = newItem.category === 'Custom Card' ? newItem.customCategory : newItem.category;
-            await addInventoryItem({
-                item_name: newItem.title,
-                category: finalCategory || 'Custom Card',
-                stock_quantity: parseInt(newItem.stock),
-                cost_per_unit: parseFloat(newItem.price),
-                low_stock_threshold: 20 // Default or add a field
-            });
-
-            setNewItem({ title: '', category: 'Invitation Cards', customCategory: '', stock: 0, price: 0, image: '' });
-            setImagePreview('');
-            setShowAddModal(false);
+            await updateCardType(editingType.id, { name: editTypeName.trim(), description: editTypeDesc.trim() || null });
+            setShowEditTypeModal(false);
+            setEditingType(null);
         } catch (error) {
-            alert('Error adding item: ' + (error.message || 'Unknown error'));
+            alert('Error updating card type: ' + (error?.message || 'Unknown error'));
         }
     };
 
-    const handleUpdateItem = async () => {
-        if (!editingItem.title) return;
-
+    const handleDeleteCardType = async (id, name) => {
+        if (!confirm(`Are you sure you want to delete "${name}"? All subcategories and products inside will also be removed.`)) return;
         try {
-            const finalCategory = editingItem.category === 'Custom Card' ? customEditCategory : editingItem.category;
-            await updateInventoryItem(editingItem.id, {
-                item_name: editingItem.title,
-                category: finalCategory || 'Custom Card',
-                stock_quantity: parseInt(editingItem.stock),
-                cost_per_unit: parseFloat(editingItem.price),
-                low_stock_threshold: 20
-            });
-            setShowEditModal(false);
-            setEditingItem(null);
-            setEditImagePreview('');
-            setCustomEditCategory('');
+            await deleteCardType(id);
         } catch (error) {
-            alert('Error updating item: ' + (error.message || 'Unknown error'));
+            alert('Error deleting card type: ' + (error?.message || 'Unknown error'));
         }
+    };
+
+    const openEditType = (ct) => {
+        setEditingType(ct);
+        setEditTypeName(ct.name);
+        setEditTypeDesc(ct.description || '');
+        setShowEditTypeModal(true);
     };
 
     return (
@@ -113,340 +95,159 @@ const Inventory = () => {
                     <div className="page-header">
                         <div>
                             <h1 className="page-title">Stock & Inventory</h1>
-                            <p className="page-subtitle">Manage your card types and stock levels.</p>
+                            <p className="page-subtitle">Manage your card types, subcategories, and stock levels.</p>
                         </div>
                         <div className="header-actions">
                             <div className="search-wrapper-large">
                                 <Search className="search-icon" size={18} />
                                 <input type="text" placeholder="Search card types..." />
                             </div>
-                            <button className="btn-primary" onClick={() => setShowAddModal(true)}>
-                                <Plus size={20} />
-                                <span>Add Product</span>
+                            <button className="btn-primary" onClick={() => setShowAddTypeModal(true)}>
+                                <FolderPlus size={20} />
+                                <span>Add Card Type</span>
                             </button>
                         </div>
                     </div>
 
-                    <div className="card" style={{ marginBottom: '24px' }}>
-                        <div className="order-selection-row">
-                            {['Invitation Cards', 'Visiting Cards', 'Bill Books'].map(cat => (
-                                <button key={cat} className="action-btn" onClick={() => navigate(`/inventory/${cat.toLowerCase().replace(/ /g, '-')}`)}>
-                                    <span>{cat}</span>
-                                </button>
-                            ))}
-                            {[...new Set(inventory
-                                .map(item => item.category)
-                                .filter(cat => cat && !['Invitation Cards', 'Visiting Cards', 'Bill Books', 'Custom Card'].includes(cat))
-                            )].map(cat => (
-                                <button key={cat} className="action-btn" onClick={() => navigate(`/inventory/${cat.toLowerCase().replace(/ /g, '-')}`)}>
-                                    <span>{cat}</span>
-                                </button>
-                            ))}
-                        </div>
+                    {/* Card Types Grid */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px', marginTop: '24px' }}>
+                        {cardTypes.map(ct => (
+                            <div key={ct.id} className="card" style={{
+                                padding: '24px',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                border: '1px solid #E5E7EB',
+                                borderRadius: '12px',
+                                position: 'relative'
+                            }}
+                                onClick={() => navigate(`/inventory/type/${ct.id}`)}
+                                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.1)'; }}
+                                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
+                            >
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                    <div>
+                                        <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#1F2937', marginBottom: '4px' }}>{ct.name}</h3>
+                                        {ct.description && <p style={{ fontSize: '13px', color: '#6B7280', marginBottom: '8px' }}>{ct.description}</p>}
+                                        <span style={{ fontSize: '13px', color: '#3B82F6', fontWeight: '500' }}>
+                                            {ct.subcategories_count || 0} subcategories
+                                        </span>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '4px' }} onClick={e => e.stopPropagation()}>
+                                        <button
+                                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6B7280', padding: '4px' }}
+                                            onClick={() => openEditType(ct)}
+                                            title="Edit"
+                                        >
+                                            <Edit size={16} />
+                                        </button>
+                                        <button
+                                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444', padding: '4px' }}
+                                            onClick={() => handleDeleteCardType(ct.id, ct.name)}
+                                            title="Delete"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+
+                        {cardTypes.length === 0 && (
+                            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '60px 20px', color: '#9CA3AF' }}>
+                                <FolderPlus size={48} style={{ marginBottom: '16px', opacity: 0.5 }} />
+                                <p style={{ fontSize: '16px', fontWeight: '500', marginBottom: '8px' }}>No card types yet</p>
+                                <p style={{ fontSize: '14px' }}>Click "Add Card Type" to create your first category.</p>
+                            </div>
+                        )}
                     </div>
-                </div>
-
-
-
-                <div className="pagination">
-                    <button className="icon-btn-outline small">
-                        <ChevronLeft size={16} />
-                    </button>
-                    <button className="page-btn active">1</button>
-                    <button className="page-btn">2</button>
-                    <button className="page-btn">3</button>
-                    <span className="page-ellipsis">...</span>
-                    <button className="icon-btn-outline small">
-                        <ChevronRight size={16} />
-                    </button>
                 </div>
             </main>
 
-            {showAddModal && (
+            {/* Add Card Type Modal */}
+            {showAddTypeModal && (
                 <div className="modal-overlay" style={{
                     position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
                     backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000
                 }}>
                     <div className="modal-content" style={{
-                        backgroundColor: 'white', padding: '24px', borderRadius: '12px', width: '450px',
-                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', maxHeight: '90vh', overflowY: 'auto'
+                        backgroundColor: 'white', borderRadius: '16px', padding: '32px', width: '90%', maxWidth: '450px', boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
                     }}>
-                        <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-                            <h3 style={{ fontSize: '18px', fontWeight: '600' }}>Add New Card Type</h3>
-                            <button onClick={() => {
-                                setShowAddModal(false);
-                                setImagePreview('');
-                            }} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                                <X size={20} />
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                            <h2 style={{ fontSize: '20px', fontWeight: '700' }}>Add Card Type</h2>
+                            <button style={{ background: 'none', border: 'none', cursor: 'pointer' }} onClick={() => setShowAddTypeModal(false)}>
+                                <X size={24} />
                             </button>
                         </div>
-
-                        {/* Image Upload Section */}
                         <div className="form-group">
-                            <label>Product Image</label>
-                            <div style={{
-                                border: '2px dashed #E5E7EB',
-                                borderRadius: '8px',
-                                padding: '20px',
-                                textAlign: 'center',
-                                cursor: 'pointer',
-                                backgroundColor: imagePreview ? '#fff' : '#F9FAFB',
-                                marginBottom: '12px'
-                            }}>
-                                {imagePreview ? (
-                                    <div style={{ position: 'relative' }}>
-                                        <img src={imagePreview} alt="Preview" style={{
-                                            maxWidth: '100%',
-                                            maxHeight: '200px',
-                                            borderRadius: '8px'
-                                        }} />
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setImagePreview('');
-                                                setNewItem({ ...newItem, image: '' });
-                                            }}
-                                            style={{
-                                                position: 'absolute',
-                                                top: '8px',
-                                                right: '8px',
-                                                background: 'white',
-                                                border: 'none',
-                                                borderRadius: '50%',
-                                                width: '28px',
-                                                height: '28px',
-                                                cursor: 'pointer',
-                                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                                            }}
-                                        >
-                                            ×
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <label htmlFor="image-upload" style={{ cursor: 'pointer', display: 'block' }}>
-                                        <ImageIcon size={48} style={{ margin: '0 auto 12px', color: '#9CA3AF' }} />
-                                        <p style={{ color: '#6B7280', marginBottom: '4px' }}>Click to upload image</p>
-                                        <p style={{ color: '#9CA3AF', fontSize: '12px' }}>PNG, JPG up to 5MB</p>
-                                        <input
-                                            id="image-upload"
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={handleImageUpload}
-                                            style={{ display: 'none' }}
-                                        />
-                                    </label>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="form-group">
-                            <label>Card Title *</label>
+                            <label>Card Type Name *</label>
                             <input
                                 type="text"
                                 className="form-input"
-                                value={newItem.title}
-                                onChange={(e) => setNewItem({ ...newItem, title: e.target.value })}
-                                placeholder="e.g. Gold Foil Wedding Invite"
+                                value={newTypeName}
+                                onChange={(e) => setNewTypeName(e.target.value)}
+                                placeholder="e.g. Invitation Cards, Visiting Cards"
                             />
                         </div>
                         <div className="form-group">
-                            <label>Card Type *</label>
-                            <select
-                                className="form-input"
-                                value={newItem.category}
-                                onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
-                            >
-                                <option value="Invitation Cards">Invitation Cards</option>
-                                <option value="Visiting Cards">Visiting Cards</option>
-                                <option value="Bill Books">Bill Books</option>
-                                <option value="Custom Card">Custom Card</option>
-                            </select>
-                        </div>
-                        {newItem.category === 'Custom Card' && (
-                            <div className="form-group" style={{ marginTop: '-12px', paddingLeft: '8px' }}>
-                                <label style={{ fontSize: '14px', color: '#4B5563' }}>Specify Card Type Name *</label>
-                                <input
-                                    type="text"
-                                    className="form-input"
-                                    value={newItem.customCategory}
-                                    onChange={(e) => setNewItem({ ...newItem, customCategory: e.target.value })}
-                                    placeholder="e.g. Posters, Calendars"
-                                />
-                            </div>
-                        )}
-                        <div className="form-group">
-                            <label>Initial Stock</label>
+                            <label>Description (Optional)</label>
                             <input
-                                type="number"
+                                type="text"
                                 className="form-input"
-                                value={newItem.stock}
-                                onChange={(e) => setNewItem({ ...newItem, stock: e.target.value })}
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label>Price per Unit</label>
-                            <input
-                                type="number"
-                                className="form-input"
-                                value={newItem.price}
-                                onChange={(e) => setNewItem({ ...newItem, price: e.target.value })}
-                                step="0.01"
+                                value={newTypeDesc}
+                                onChange={(e) => setNewTypeDesc(e.target.value)}
+                                placeholder="e.g. All types of invitation cards"
                             />
                         </div>
                         <div className="modal-actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
-                            <button className="btn-secondary" onClick={() => {
-                                setShowAddModal(false);
-                                setImagePreview('');
-                            }}>Cancel</button>
-                            <button className="btn-primary" onClick={handleAddItem}>Add Item</button>
+                            <button className="btn-secondary" onClick={() => setShowAddTypeModal(false)}>Cancel</button>
+                            <button className="btn-primary" onClick={handleAddCardType}>Create</button>
                         </div>
                     </div>
                 </div>
-            )
-            }
+            )}
 
-            {/* Edit Item Modal */}
-            {
-                showEditModal && editingItem && (
-                    <div className="modal-overlay" style={{
-                        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                        backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000
+            {/* Edit Card Type Modal */}
+            {showEditTypeModal && (
+                <div className="modal-overlay" style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000
+                }}>
+                    <div className="modal-content" style={{
+                        backgroundColor: 'white', borderRadius: '16px', padding: '32px', width: '90%', maxWidth: '450px', boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
                     }}>
-                        <div className="modal-content" style={{
-                            backgroundColor: 'white', padding: '24px', borderRadius: '12px', width: '450px',
-                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', maxHeight: '90vh', overflowY: 'auto'
-                        }}>
-                            <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-                                <h3 style={{ fontSize: '18px', fontWeight: '600' }}>Edit Card Type</h3>
-                                <button onClick={() => {
-                                    setShowEditModal(false);
-                                    setEditingItem(null);
-                                }} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                                    <X size={20} />
-                                </button>
-                            </div>
-
-                            {/* Edit Image Upload Section */}
-                            <div className="form-group">
-                                <label>Product Image</label>
-                                <div style={{
-                                    border: '2px dashed #E5E7EB',
-                                    borderRadius: '8px',
-                                    padding: '20px',
-                                    textAlign: 'center',
-                                    cursor: 'pointer',
-                                    backgroundColor: editImagePreview ? '#fff' : '#F9FAFB',
-                                    marginBottom: '12px'
-                                }}>
-                                    {editImagePreview ? (
-                                        <div style={{ position: 'relative' }}>
-                                            <img src={editImagePreview} alt="Preview" style={{
-                                                maxWidth: '100%',
-                                                maxHeight: '200px',
-                                                borderRadius: '8px'
-                                            }} />
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setEditImagePreview('');
-                                                    setEditingItem({ ...editingItem, image: '' });
-                                                }}
-                                                style={{
-                                                    position: 'absolute',
-                                                    top: '8px',
-                                                    right: '8px',
-                                                    background: 'white',
-                                                    border: 'none',
-                                                    borderRadius: '50%',
-                                                    width: '28px',
-                                                    height: '28px',
-                                                    cursor: 'pointer',
-                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                                                }}
-                                            >
-                                                ×
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <label htmlFor="edit-image-upload" style={{ cursor: 'pointer', display: 'block' }}>
-                                            <ImageIcon size={48} style={{ margin: '0 auto 12px', color: '#9CA3AF' }} />
-                                            <p style={{ color: '#6B7280', marginBottom: '4px' }}>Click to upload image</p>
-                                            <p style={{ color: '#9CA3AF', fontSize: '12px' }}>PNG, JPG up to 5MB</p>
-                                            <input
-                                                id="edit-image-upload"
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={(e) => handleImageUpload(e, true)}
-                                                style={{ display: 'none' }}
-                                            />
-                                        </label>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="form-group">
-                                <label>Card Title *</label>
-                                <input
-                                    type="text"
-                                    className="form-input"
-                                    value={editingItem.title}
-                                    onChange={(e) => setEditingItem({ ...editingItem, title: e.target.value })}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Card Type *</label>
-                                <select
-                                    className="form-input"
-                                    value={editingItem.category}
-                                    onChange={(e) => setEditingItem({ ...editingItem, category: e.target.value })}
-                                >
-                                    <option value="Invitation Cards">Invitation Cards</option>
-                                    <option value="Visiting Cards">Visiting Cards</option>
-                                    <option value="Bill Books">Bill Books</option>
-                                    <option value="Custom Card">Custom Card</option>
-                                </select>
-                            </div>
-                            {editingItem.category === 'Custom Card' && (
-                                <div className="form-group" style={{ marginTop: '-12px', paddingLeft: '8px' }}>
-                                    <label style={{ fontSize: '14px', color: '#4B5563' }}>Specify Card Type Name *</label>
-                                    <input
-                                        type="text"
-                                        className="form-input"
-                                        value={customEditCategory}
-                                        onChange={(e) => setCustomEditCategory(e.target.value)}
-                                        placeholder="e.g. Posters, Calendars"
-                                    />
-                                </div>
-                            )}
-                            <div className="form-group">
-                                <label>Current Stock</label>
-                                <input
-                                    type="number"
-                                    className="form-input"
-                                    value={editingItem.stock}
-                                    onChange={(e) => setEditingItem({ ...editingItem, stock: e.target.value })}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Price per Unit</label>
-                                <input
-                                    type="number"
-                                    className="form-input"
-                                    value={editingItem.price}
-                                    onChange={(e) => setEditingItem({ ...editingItem, price: e.target.value })}
-                                    step="0.01"
-                                />
-                            </div>
-                            <div className="modal-actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
-                                <button className="btn-secondary" onClick={() => {
-                                    setShowEditModal(false);
-                                    setEditingItem(null);
-                                }}>Cancel</button>
-                                <button className="btn-primary" onClick={handleUpdateItem}>Update Item</button>
-                            </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                            <h2 style={{ fontSize: '20px', fontWeight: '700' }}>Edit Card Type</h2>
+                            <button style={{ background: 'none', border: 'none', cursor: 'pointer' }} onClick={() => setShowEditTypeModal(false)}>
+                                <X size={24} />
+                            </button>
+                        </div>
+                        <div className="form-group">
+                            <label>Card Type Name *</label>
+                            <input
+                                type="text"
+                                className="form-input"
+                                value={editTypeName}
+                                onChange={(e) => setEditTypeName(e.target.value)}
+                                placeholder="e.g. Invitation Cards"
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label>Description (Optional)</label>
+                            <input
+                                type="text"
+                                className="form-input"
+                                value={editTypeDesc}
+                                onChange={(e) => setEditTypeDesc(e.target.value)}
+                                placeholder="e.g. All types of invitation cards"
+                            />
+                        </div>
+                        <div className="modal-actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
+                            <button className="btn-secondary" onClick={() => setShowEditTypeModal(false)}>Cancel</button>
+                            <button className="btn-primary" onClick={handleEditCardType}>Update</button>
                         </div>
                     </div>
-                )}
+                </div>
+            )}
         </div>
     );
 };
