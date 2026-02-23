@@ -21,13 +21,14 @@ const Inventory = () => {
     const navigate = useNavigate();
     const { addInventoryItem, updateInventoryItem } = useData();
     const [showAddModal, setShowAddModal] = useState(false);
-    const [newItem, setNewItem] = useState({ title: '', category: 'Invitation Cards', stock: 0, price: 0, image: '' });
+    const [newItem, setNewItem] = useState({ title: '', category: 'Invitation Cards', customCategory: '', stock: 0, price: 0, image: '' });
     const [imagePreview, setImagePreview] = useState('');
 
     // Edit State
     const [showEditModal, setShowEditModal] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
     const [editImagePreview, setEditImagePreview] = useState('');
+    const [customEditCategory, setCustomEditCategory] = useState('');
 
     const handleImageUpload = (e, isEdit = false) => {
         const file = e.target.files[0];
@@ -50,15 +51,16 @@ const Inventory = () => {
         if (!newItem.title) return;
 
         try {
+            const finalCategory = newItem.category === 'Custom Card' ? newItem.customCategory : newItem.category;
             await addInventoryItem({
                 item_name: newItem.title,
-                category: newItem.category,
+                category: finalCategory || 'Custom Card',
                 stock_quantity: parseInt(newItem.stock),
                 cost_per_unit: parseFloat(newItem.price),
                 low_stock_threshold: 20 // Default or add a field
             });
 
-            setNewItem({ title: '', category: 'Invitation Cards', stock: 0, price: 0, image: '' });
+            setNewItem({ title: '', category: 'Invitation Cards', customCategory: '', stock: 0, price: 0, image: '' });
             setImagePreview('');
             setShowAddModal(false);
         } catch (error) {
@@ -70,9 +72,10 @@ const Inventory = () => {
         if (!editingItem.title) return;
 
         try {
+            const finalCategory = editingItem.category === 'Custom Card' ? customEditCategory : editingItem.category;
             await updateInventoryItem(editingItem.id, {
                 item_name: editingItem.title,
-                category: editingItem.category,
+                category: finalCategory || 'Custom Card',
                 stock_quantity: parseInt(editingItem.stock),
                 cost_per_unit: parseFloat(editingItem.price),
                 low_stock_threshold: 20
@@ -80,6 +83,7 @@ const Inventory = () => {
             setShowEditModal(false);
             setEditingItem(null);
             setEditImagePreview('');
+            setCustomEditCategory('');
         } catch (error) {
             alert('Error updating item: ' + (error.message || 'Unknown error'));
         }
@@ -389,6 +393,18 @@ const Inventory = () => {
                                     <option value="Custom Card">Custom Card</option>
                                 </select>
                             </div>
+                            {editingItem.category === 'Custom Card' && (
+                                <div className="form-group" style={{ marginTop: '-12px', paddingLeft: '8px' }}>
+                                    <label style={{ fontSize: '14px', color: '#4B5563' }}>Specify Card Type Name *</label>
+                                    <input
+                                        type="text"
+                                        className="form-input"
+                                        value={customEditCategory}
+                                        onChange={(e) => setCustomEditCategory(e.target.value)}
+                                        placeholder="e.g. Posters, Calendars"
+                                    />
+                                </div>
+                            )}
                             <div className="form-group">
                                 <label>Current Stock</label>
                                 <input
