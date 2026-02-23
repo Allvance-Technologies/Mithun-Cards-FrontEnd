@@ -30,15 +30,15 @@ const InventoryCategory = () => {
     if (!subtype) return filtered;
 
     const key = subtype.toLowerCase();
-    if (key === 'wedding') return filtered.filter(i => i.title.toLowerCase().includes('wedding'));
-    if (key === 'engagement') return filtered.filter(i => i.title.toLowerCase().includes('engagement'));
-    if (key === 'baptism') return filtered.filter(i => i.title.toLowerCase().includes('baptism'));
-    if (key === 'holy-communion') return filtered.filter(i => i.title.toLowerCase().includes('communion'));
+    if (key === 'wedding') return filtered.filter(i => (i.title || '').toLowerCase().includes('wedding'));
+    if (key === 'engagement') return filtered.filter(i => (i.title || '').toLowerCase().includes('engagement'));
+    if (key === 'baptism') return filtered.filter(i => (i.title || '').toLowerCase().includes('baptism'));
+    if (key === 'holy-communion') return filtered.filter(i => (i.title || '').toLowerCase().includes('communion'));
     if (key === 'others') return filtered.filter(i => !(
-      i.title.toLowerCase().includes('wedding') ||
-      i.title.toLowerCase().includes('engagement') ||
-      i.title.toLowerCase().includes('baptism') ||
-      i.title.toLowerCase().includes('communion')
+      (i.title || '').toLowerCase().includes('wedding') ||
+      (i.title || '').toLowerCase().includes('engagement') ||
+      (i.title || '').toLowerCase().includes('baptism') ||
+      (i.title || '').toLowerCase().includes('communion')
     ));
     return filtered;
   };

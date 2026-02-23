@@ -228,7 +228,7 @@ const OrderTypeCategory = () => {
 
                                 <div className="products-grid">
                                     {filteredProducts
-                                        .filter(item => item.title.toLowerCase().includes(searchQuery.toLowerCase()))
+                                        .filter(item => (item.title || '').toLowerCase().includes(searchQuery.toLowerCase()))
                                         .map(item => (
                                             <div key={item.id} className="product-card" onClick={() => handleAddItem(item)}>
                                                 {item.image && (
@@ -246,7 +246,7 @@ const OrderTypeCategory = () => {
                                                 <button className="add-btn"><Plus size={18} /></button>
                                             </div>
                                         ))}
-                                    {filteredProducts.filter(item => item.title.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
+                                    {filteredProducts.filter(item => (item.title || '').toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
                                         <div className="card" style={{ gridColumn: '1 / -1' }}>
                                             <p style={{ color: '#6B7280' }}>No products found in this subcategory. Add products in Inventory first.</p>
                                         </div>

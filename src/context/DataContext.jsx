@@ -46,16 +46,17 @@ export const DataProvider = ({ children }) => {
                 api.get('card-types').catch(() => ({ data: [] }))
             ]);
 
-            // Map inventory
-            const mappedInventory = (inventoryRes.data || []).map(item => ({
+            // Map inventory - handle both array and { data: [...] } response formats
+            const rawInventory = Array.isArray(inventoryRes.data) ? inventoryRes.data : (inventoryRes.data?.data || []);
+            const mappedInventory = rawInventory.map(item => ({
                 id: item.id,
-                title: item.item_name,
-                category: item.category,
-                subcategory_id: item.subcategory_id,
-                stock: item.stock_quantity,
-                price: item.cost_per_unit,
+                title: item.item_name || '',
+                category: item.category || '',
+                subcategory_id: item.subcategory_id || null,
+                stock: item.stock_quantity ?? 0,
+                price: item.cost_per_unit ?? 0,
                 status: item.is_low_stock ? 'Low Stock' : (item.stock_quantity === 0 ? 'Out of Stock' : 'In Stock'),
-                image: item.image || null
+                image: item.image_url || item.image || null
             }));
 
             // Map orders
@@ -263,13 +264,13 @@ export const DataProvider = ({ children }) => {
             const raw = response.data?.data || response.data;
             const mappedItem = {
                 id: raw.id,
-                title: raw.item_name,
-                category: raw.category,
-                subcategory_id: raw.subcategory_id,
-                stock: raw.stock_quantity,
-                price: raw.cost_per_unit,
+                title: raw.item_name || '',
+                category: raw.category || '',
+                subcategory_id: raw.subcategory_id || null,
+                stock: raw.stock_quantity ?? 0,
+                price: raw.cost_per_unit ?? 0,
                 status: raw.is_low_stock ? 'Low Stock' : (raw.stock_quantity === 0 ? 'Out of Stock' : 'In Stock'),
-                image: raw.image || null
+                image: raw.image_url || raw.image || null
             };
             setInventory([...inventory, mappedItem]);
             return mappedItem;
@@ -286,13 +287,13 @@ export const DataProvider = ({ children }) => {
             const raw = response.data?.data || response.data;
             const mappedItem = {
                 id: raw.id,
-                title: raw.item_name,
-                category: raw.category,
-                subcategory_id: raw.subcategory_id,
-                stock: raw.stock_quantity,
-                price: raw.cost_per_unit,
+                title: raw.item_name || '',
+                category: raw.category || '',
+                subcategory_id: raw.subcategory_id || null,
+                stock: raw.stock_quantity ?? 0,
+                price: raw.cost_per_unit ?? 0,
                 status: raw.is_low_stock ? 'Low Stock' : (raw.stock_quantity === 0 ? 'Out of Stock' : 'In Stock'),
-                image: raw.image || null
+                image: raw.image_url || raw.image || null
             };
             setInventory(inventory.map(i => i.id === id ? mappedItem : i));
             return mappedItem;

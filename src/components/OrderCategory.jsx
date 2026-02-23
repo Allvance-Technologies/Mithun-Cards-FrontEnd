@@ -22,15 +22,15 @@ const OrderCategory = () => {
   const filterBySubtype = (list) => {
     if (!subtype) return list;
     const key = subtype.toLowerCase();
-    if (key === 'wedding') return list.filter(i => i.title.toLowerCase().includes('wedding'));
-    if (key === 'engagement') return list.filter(i => i.title.toLowerCase().includes('engagement'));
-    if (key === 'baptism') return list.filter(i => i.title.toLowerCase().includes('baptism'));
-    if (key === 'holy-communion') return list.filter(i => i.title.toLowerCase().includes('communion'));
+    if (key === 'wedding') return list.filter(i => (i.title || '').toLowerCase().includes('wedding'));
+    if (key === 'engagement') return list.filter(i => (i.title || '').toLowerCase().includes('engagement'));
+    if (key === 'baptism') return list.filter(i => (i.title || '').toLowerCase().includes('baptism'));
+    if (key === 'holy-communion') return list.filter(i => (i.title || '').toLowerCase().includes('communion'));
     if (key === 'others') return list.filter(i => !(
-      i.title.toLowerCase().includes('wedding') ||
-      i.title.toLowerCase().includes('engagement') ||
-      i.title.toLowerCase().includes('baptism') ||
-      i.title.toLowerCase().includes('communion')
+      (i.title || '').toLowerCase().includes('wedding') ||
+      (i.title || '').toLowerCase().includes('engagement') ||
+      (i.title || '').toLowerCase().includes('baptism') ||
+      (i.title || '').toLowerCase().includes('communion')
     ));
     return list;
   };
@@ -278,7 +278,7 @@ const OrderCategory = () => {
                     </div>
 
                     <div className="products-grid">
-                      {filterBySubtype(inventory).filter(item => item.title.toLowerCase().includes(searchQuery.toLowerCase())).map(item => (
+                      {filterBySubtype(inventory).filter(item => (item.title || '').toLowerCase().includes(searchQuery.toLowerCase())).map(item => (
                         <div key={item.id} className="product-card" onClick={() => handleAddItem(item)}>
                           {item.image && (
                             <div className="product-image-thumb">
@@ -295,7 +295,7 @@ const OrderCategory = () => {
                           <button className="add-btn"><Plus size={18} /></button>
                         </div>
                       ))}
-                      {filterBySubtype(inventory).filter(item => item.title.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
+                      {filterBySubtype(inventory).filter(item => (item.title || '').toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
                         <div className="card" style={{ gridColumn: '1 / -1' }}>
                           <p style={{ color: '#6B7280' }}>No examples available for this category.</p>
                         </div>
@@ -480,7 +480,7 @@ const OrderCategory = () => {
                   </div>
 
                   <div className="products-grid">
-                    {inventory.filter(item => item.title.toLowerCase().includes(searchQuery.toLowerCase())).map(item => (
+                    {inventory.filter(item => (item.title || '').toLowerCase().includes(searchQuery.toLowerCase())).map(item => (
                       <div key={item.id} className="product-card" onClick={() => handleAddItem(item)}>
                         {item.image && (
                           <div className="product-image-thumb">
@@ -497,7 +497,7 @@ const OrderCategory = () => {
                         <button className="add-btn"><Plus size={18} /></button>
                       </div>
                     ))}
-                    {inventory.filter(item => item.title.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
+                    {inventory.filter(item => (item.title || '').toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
                       <div className="card" style={{ gridColumn: '1 / -1' }}>
                         <p style={{ color: '#6B7280' }}>No products found.</p>
                       </div>
