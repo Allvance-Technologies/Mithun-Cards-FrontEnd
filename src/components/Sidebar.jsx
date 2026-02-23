@@ -51,7 +51,7 @@ const Sidebar = () => {
                         </div>
                     )}
                     <div className="logo-details">
-                        <h2 className="brand-name" style={{ fontSize: '20px' }}>Mithun Cards</h2>
+                        <h2 className="brand-name" style={{ fontSize: '24px' }}>Mithun Cards</h2>
                         <p className="brand-subtitle">Billing Software</p>
                     </div>
                 </div>
@@ -104,10 +104,10 @@ const Sidebar = () => {
 
             <div className="sidebar-footer">
                 <div className="card" style={{ margin: '12px', padding: '12px', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: '8px', color: 'white' }}>
-                    <div style={{ fontSize: '14px', opacity: 0.9 }}>{day}</div>
+                    <div style={{ fontSize: '18px', opacity: 0.9 }}>{day}</div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px' }}>
-                        <div style={{ fontSize: '16px', fontWeight: 600 }}>{date} {month}</div>
-                        <div style={{ fontSize: '16px', fontWeight: 600 }}>{hours}:{minutes}</div>
+                        <div style={{ fontSize: '20px', fontWeight: 600 }}>{date} {month}</div>
+                        <div style={{ fontSize: '20px', fontWeight: 600 }}>{hours}:{minutes}</div>
                     </div>
                 </div>
                 {/* User profile can be passed as props or static for now */}

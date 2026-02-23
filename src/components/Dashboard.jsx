@@ -32,14 +32,14 @@ const Dashboard = () => {
 
             {/* Main Content */}
             <main className="main-content">
-                
+
                 <div className="dashboard-content">
                     <h1 className="page-title">Home</h1>
 
-                    
+
 
                     <div className="dashboard-grid">
-                        
+
                         {/* Quick Actions */}
                         <div className="card actions-card">
                             <div className="card-header">
@@ -73,7 +73,7 @@ const Dashboard = () => {
                             </div>
                         </div>
 
-                        
+
 
                         {/* Low Stock Alerts */}
                         <div className="card alerts-card">
@@ -96,7 +96,7 @@ const Dashboard = () => {
                                         </div>
                                     ))
                                 ) : (
-                                    <div style={{ padding: '12px', color: '#6B7280', fontSize: '14px' }}>All items are well stocked.</div>
+                                    <div style={{ padding: '12px', color: '#6B7280', fontSize: '16px' }}>All items are well stocked.</div>
                                 )}
                             </div>
                         </div>

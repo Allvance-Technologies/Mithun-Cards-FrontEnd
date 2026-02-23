@@ -246,7 +246,7 @@ const Reports = () => {
                                                 }}
                                                 title={`${data.label}: $${data.value.toFixed(2)}`}
                                             ></div>
-                                            <span style={{ fontSize: '10px', marginTop: '4px', color: '#6b7280' }}>{data.label}</span>
+                                            <span style={{ fontSize: '12px', marginTop: '4px', color: '#6b7280' }}>{data.label}</span>
                                         </div>
                                     ))}
                                 </div>
