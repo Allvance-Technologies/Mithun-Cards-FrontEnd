@@ -58,6 +58,15 @@ const OrderCategory = () => {
   const [customPaymentMethod, setCustomPaymentMethod] = useState('');
   const [amountPaid, setAmountPaid] = useState(0);
 
+  // New fields for specific invoice types
+  const [buyerGSTIN, setBuyerGSTIN] = useState('');
+  const [despatchDetails, setDespatchDetails] = useState({
+    through: '',
+    from: '',
+    to: '',
+    artics: ''
+  });
+
   React.useEffect(() => {
     if (orderId && orders && orders.length > 0) {
       const orderToEdit = orders.find(o => o.id.toString() === orderId.toString());
@@ -198,7 +207,11 @@ const OrderCategory = () => {
       discount: discount,
       advance_paid: amountPaid,
       payment_method: paymentMethod === 'Others' ? customPaymentMethod : paymentMethod,
-      status: amountPaid >= calculateTotal() ? 'Paid' : 'Pending'
+      status: amountPaid >= calculateTotal() ? 'Paid' : 'Pending',
+      // Add extra fields
+      includeGST: includeGST,
+      buyerGSTIN: includeGST ? buyerGSTIN : '',
+      despatch: includeGST ? despatchDetails : null
     };
 
     if (isNewCustomer) {
@@ -224,13 +237,13 @@ const OrderCategory = () => {
 
       // Ensure the invoice has all calculated fields for display
       setInvoiceOrder({
-        ...finalOrder,
-        subtotal: subtotal,
-        tax: tax,
-        discount: discount,
-        amount: total, // Use frontend calculated total for consistency
-        balance_due: total - amountPaid,
-        advance_paid: amountPaid
+        ...orderData,
+        id: finalOrder.id,
+        customer: finalOrder.customer,
+        date: finalOrder.date,
+        items: finalOrder.items,
+        amount: total,
+        balance_due: total - amountPaid
       });
 
       setShowInvoice(true);
@@ -366,10 +379,54 @@ const OrderCategory = () => {
 
 
 
-                <div className="order-status-select" style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <input type="checkbox" id="include-gst" checked={includeGST} onChange={(e) => setIncludeGST(e.target.checked)} />
-                  <label htmlFor="include-gst">Include GST</label>
+                <div className="invoice-mode-selector" style={{ marginBottom: '16px', display: 'flex', gap: '8px' }}>
+                  <button
+                    onClick={() => setIncludeGST(true)}
+                    className={`mode-btn ${includeGST ? 'active' : ''}`}
+                    style={{
+                      flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #E5E7EB',
+                      backgroundColor: includeGST ? '#EEF2FF' : '#fff',
+                      color: includeGST ? '#4F46E5' : '#6B7280',
+                      borderColor: includeGST ? '#4F46E5' : '#E5E7EB',
+                      fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s'
+                    }}
+                  >
+                    GST Bill
+                  </button>
+                  <button
+                    onClick={() => setIncludeGST(false)}
+                    className={`mode-btn ${!includeGST ? 'active' : ''}`}
+                    style={{
+                      flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #E5E7EB',
+                      backgroundColor: !includeGST ? '#F0FDF4' : '#fff',
+                      color: !includeGST ? '#16A34A' : '#6B7280',
+                      borderColor: !includeGST ? '#16A34A' : '#E5E7EB',
+                      fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s'
+                    }}
+                  >
+                    Non-GST Bill
+                  </button>
                 </div>
+
+                {includeGST && (
+                  <div className="gst-specific-fields" style={{ backgroundColor: '#F9FAFB', padding: '12px', borderRadius: '8px', marginBottom: '16px', border: '1px solid #E5E7EB' }}>
+                    <h4 style={{ fontSize: '13px', margin: '0 0 10px 0', color: '#374151' }}>Dispatch & GST Info</h4>
+                    <div style={{ marginBottom: '8px' }}>
+                      <label style={{ fontSize: '11px', display: 'block', marginBottom: '2px' }}>Buyer's GSTIN</label>
+                      <input type="text" className="form-input" placeholder="Optional" value={buyerGSTIN} onChange={(e) => setBuyerGSTIN(e.target.value)} />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                      <div>
+                        <label style={{ fontSize: '11px', display: 'block', marginBottom: '2px' }}>Through</label>
+                        <input type="text" className="form-input" placeholder="e.g. Courier" value={despatchDetails.through} onChange={(e) => setDespatchDetails({ ...despatchDetails, through: e.target.value })} />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '11px', display: 'block', marginBottom: '2px' }}>Artics</label>
+                        <input type="number" className="form-input" placeholder="No. of items" value={despatchDetails.artics} onChange={(e) => setDespatchDetails({ ...despatchDetails, artics: e.target.value })} />
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="selected-items-list">
                   {selectedItems.length === 0 ? (
@@ -608,10 +665,54 @@ const OrderCategory = () => {
 
 
 
-                <div className="order-status-select" style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <input type="checkbox" id="include-gst" checked={includeGST} onChange={(e) => setIncludeGST(e.target.checked)} />
-                  <label htmlFor="include-gst">Include GST</label>
+                <div className="invoice-mode-selector" style={{ marginBottom: '16px', display: 'flex', gap: '8px' }}>
+                  <button
+                    onClick={() => setIncludeGST(true)}
+                    className={`mode-btn ${includeGST ? 'active' : ''}`}
+                    style={{
+                      flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #E5E7EB',
+                      backgroundColor: includeGST ? '#EEF2FF' : '#fff',
+                      color: includeGST ? '#4F46E5' : '#6B7280',
+                      borderColor: includeGST ? '#4F46E5' : '#E5E7EB',
+                      fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s'
+                    }}
+                  >
+                    GST Bill
+                  </button>
+                  <button
+                    onClick={() => setIncludeGST(false)}
+                    className={`mode-btn ${!includeGST ? 'active' : ''}`}
+                    style={{
+                      flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #E5E7EB',
+                      backgroundColor: !includeGST ? '#F0FDF4' : '#fff',
+                      color: !includeGST ? '#16A34A' : '#6B7280',
+                      borderColor: !includeGST ? '#16A34A' : '#E5E7EB',
+                      fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s'
+                    }}
+                  >
+                    Non-GST Bill
+                  </button>
                 </div>
+
+                {includeGST && (
+                  <div className="gst-specific-fields" style={{ backgroundColor: '#F9FAFB', padding: '12px', borderRadius: '8px', marginBottom: '16px', border: '1px solid #E5E7EB' }}>
+                    <h4 style={{ fontSize: '13px', margin: '0 0 10px 0', color: '#374151' }}>Dispatch & GST Info</h4>
+                    <div style={{ marginBottom: '8px' }}>
+                      <label style={{ fontSize: '11px', display: 'block', marginBottom: '2px' }}>Buyer's GSTIN</label>
+                      <input type="text" className="form-input" placeholder="Optional" value={buyerGSTIN} onChange={(e) => setBuyerGSTIN(e.target.value)} />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                      <div>
+                        <label style={{ fontSize: '11px', display: 'block', marginBottom: '2px' }}>Through</label>
+                        <input type="text" className="form-input" placeholder="e.g. Courier" value={despatchDetails.through} onChange={(e) => setDespatchDetails({ ...despatchDetails, through: e.target.value })} />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '11px', display: 'block', marginBottom: '2px' }}>Artics</label>
+                        <input type="number" className="form-input" placeholder="No. of items" value={despatchDetails.artics} onChange={(e) => setDespatchDetails({ ...despatchDetails, artics: e.target.value })} />
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="selected-items-list">
                   {selectedItems.length === 0 ? (

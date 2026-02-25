@@ -49,7 +49,7 @@ export const GstInvoice = ({ order, settings, currentSubcategory, title }) => {
                     <div style={{ height: '20px', borderBottom: '1px dotted #000', marginTop: '5px' }}></div>
                     <div style={{ display: 'flex', marginTop: '10px' }}>
                         <span style={{ marginRight: '5px' }}>Buyer's GSTIN</span>
-                        <div style={{ borderBottom: '1px dotted #000', flex: 1 }}></div>
+                        <div style={{ borderBottom: '1px dotted #000', flex: 1, fontWeight: 'bold' }}>{order.buyerGSTIN || ''}</div>
                     </div>
                 </div>
                 <div style={{ padding: '5px' }}>
@@ -57,19 +57,19 @@ export const GstInvoice = ({ order, settings, currentSubcategory, title }) => {
                     <div style={{ fontSize: '12px' }}>
                         <div style={{ display: 'flex', marginBottom: '3px' }}>
                             <span style={{ width: '150px' }}>Goods Despatched Through</span>
-                            <div style={{ borderBottom: '1px dotted #000', flex: 1 }}></div>
+                            <div style={{ borderBottom: '1px dotted #000', flex: 1, fontWeight: 'bold' }}>{order.despatch?.through || ''}</div>
                         </div>
                         <div style={{ display: 'flex', marginBottom: '3px' }}>
                             <span style={{ width: '40px' }}>From</span>
-                            <div style={{ borderBottom: '1px dotted #000', flex: 1 }}></div>
+                            <div style={{ borderBottom: '1px dotted #000', flex: 1, fontWeight: 'bold' }}>{order.despatch?.from || 'NAGERCOIL'}</div>
                         </div>
                         <div style={{ display: 'flex', marginBottom: '3px' }}>
                             <span style={{ width: '20px' }}>To</span>
-                            <div style={{ borderBottom: '1px dotted #000', flex: 1 }}></div>
+                            <div style={{ borderBottom: '1px dotted #000', flex: 1, fontWeight: 'bold' }}>{order.despatch?.to || ''}</div>
                         </div>
                         <div style={{ display: 'flex' }}>
                             <span style={{ width: '110px' }}>Number of Artics</span>
-                            <div style={{ borderBottom: '1px dotted #000', flex: 1 }}></div>
+                            <div style={{ borderBottom: '1px dotted #000', flex: 1, fontWeight: 'bold' }}>{order.despatch?.artics || ''}</div>
                         </div>
                     </div>
                 </div>
